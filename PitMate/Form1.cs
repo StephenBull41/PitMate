@@ -1,0 +1,351 @@
+﻿//to do:
+//change graph so that is populates the series with the auto pressure values not assumes values from user entry
+//on graph update set min & max values based on what was calculated in auto pressures
+//no file selected handling
+//sort method to validate & remove duplicate temps
+//validate new reading temp is int
+//add validation reading temp doesn't already exist
+//on set strat validate a strat has been loaded
+
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Windows.Forms;
+using Newtonsoft.Json;
+
+namespace PitMate
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+
+
+        }
+
+        //user input readings
+        public List<TrackReading> trackReadings = new List<TrackReading>();
+        //generated readings calculated from user input
+        public List<TrackReading> autoReadings = new List<TrackReading>();
+        //setup loaded by the user
+        public dynamic setup;
+
+        private void CarSelect_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog f = new OpenFileDialog();
+            string username = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            if (username.Contains("\\")) { username = username.Remove(0, username.LastIndexOf("\\") + 1); }
+            f.InitialDirectory = $@"C:\Users\{username}\Documents\Assetto Corsa Competizione\Setups";
+            f.ShowDialog();
+            string s = File.ReadAllText(f.FileName);    
+            setup = JsonConvert.DeserializeObject(s);
+            lblCarName.Text = setup.carName;
+            lblSetupName.Text = f.FileName.Remove(0, f.FileName.LastIndexOf("\\") + 1);
+        }
+
+        private void ListReadings()
+        {
+            trackReadings = trackReadings.GroupBy(x => x.trackTemp).Select(y => y.First()).ToList(); //remove once we validate this temp doesn't yet exist
+            //sort list by track temp
+            trackReadings = trackReadings.OrderBy(x => x.trackTemp).ToList();
+            lbxReadings.Items.Clear();
+            foreach (TrackReading r in trackReadings)
+            {
+                lbxReadings.Items.Add(r.trackTemp);
+            }
+        }
+
+        private void btnAddReading_Click(object sender, EventArgs e)
+        {
+            btnSetStrats.Enabled = true;
+            btnAddReading.Enabled = false;
+            TrackReading tr = new TrackReading();
+            tr.trackTemp = Convert.ToInt32(udTrackTemp.Value);
+            tr.lf = Convert.ToDouble(udLf.Value);
+            tr.rf = Convert.ToDouble(udRf.Value);
+            tr.lr = Convert.ToDouble(udLr.Value);
+            tr.rr = Convert.ToDouble(udRr.Value);
+
+            trackReadings.Add(tr);
+            
+            ListReadings();           
+            generatePressures();
+        }
+
+        private void btnUpdateGraph_Click(object sender, EventArgs e)
+        {
+            //Clear readings
+            chtPressures.Series.Clear();
+            trackReadings.Clear();
+        }
+
+        private void updateGraph()
+        {
+            chtPressures.Series.Clear();
+            chtPressures.Series.Add("LF");
+            chtPressures.Series.Add("RF");
+            chtPressures.Series.Add("LR");
+            chtPressures.Series.Add("RR");
+            chtPressures.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            chtPressures.Series[1].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            chtPressures.Series[2].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            chtPressures.Series[3].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+
+            autoReadings = autoReadings.OrderBy(x => x.trackTemp).ToList();
+            foreach (TrackReading r in autoReadings)
+            {
+                chtPressures.Series[0].Points.AddXY(r.trackTemp, r.lf);
+                chtPressures.Series[1].Points.AddXY(r.trackTemp, r.rf);
+                chtPressures.Series[2].Points.AddXY(r.trackTemp, r.lr);
+                chtPressures.Series[3].Points.AddXY(r.trackTemp, r.rr);
+            }
+        }
+
+        private void generatePressures()
+        {
+            //remove duplicate temps
+            
+            if (trackReadings.Count > 1)
+            {
+
+                //create a temporary list, this will become our main list later
+                List<TrackReading> templist = new List<TrackReading>();
+
+                //first extrapolate for readings below the lowest entered reading if needed
+                if (trackReadings[0].trackTemp != 21)
+                {
+                    
+                    double[] delta01 = getDelta(trackReadings[0], trackReadings[1]);
+                    for (int i = 21; i < trackReadings[0].trackTemp; i++)
+                    {
+                        //if we're here then the lowest temp reading entered is > 21
+                        //extrapolate from what data we have to populate readings down to 21c
+                        int tyreDelta = trackReadings[0].trackTemp - i;
+                        TrackReading tr = new TrackReading();
+                        tr.trackTemp = i;
+                        //get the expected pressures based on the rate of pressure change of closest known readings 
+                        //and the temperature difference from the closest reading
+                        //newReading.tyre = reading[0].tyre - (tempdelta * tyreDelta)
+                        //minus because we're going down in temp
+
+                        tr.lf = Math.Round(trackReadings[0].lf - (delta01[0] * tyreDelta), 1);
+                        tr.rf = Math.Round(trackReadings[0].rf - (delta01[1] * tyreDelta), 1);
+                        tr.lr = Math.Round(trackReadings[0].lr - (delta01[2] * tyreDelta), 1);
+                        tr.rr = Math.Round(trackReadings[0].rr - (delta01[3] * tyreDelta), 1);
+                        templist.Add(tr);
+                    }
+                }
+
+                //next populate readings within temps provided
+                //for each track reading except the last
+                
+                for (int i = 0; i < trackReadings.Count - 1; i++)
+                {
+                    //validate we're not working with the final temps & there is a gap between readings
+                    if (trackReadings[i].trackTemp < 41 && (trackReadings[i + 1].trackTemp - trackReadings[i].trackTemp) > 1)
+                    {
+                        double[] delta = getDelta(trackReadings[i], trackReadings[i + 1]);
+                        //create a reading for each degree between existing readings
+                        for (int j = 0; j < (trackReadings[i + 1].trackTemp - trackReadings[i].trackTemp - 1); j++)
+                        {
+                            TrackReading tr = new TrackReading();
+                            tr.trackTemp = trackReadings[i].trackTemp + j + 1;
+                            tr.lf = Math.Round(trackReadings[i].lf + (delta[0] * (j + 1)), 1);
+                            tr.rf = Math.Round(trackReadings[i].rf + (delta[1] * (j + 1)), 1);
+                            tr.lr = Math.Round(trackReadings[i].lr + (delta[2] * (j + 1)), 1);
+                            tr.rr = Math.Round(trackReadings[i].rr + (delta[3] * (j + 1)), 1);
+                            templist.Add(tr);
+                        }
+                    }
+                }
+
+                //finaly extrapolate readings beyond the highest reading if that reading is not 42(max)
+
+                if (trackReadings[trackReadings.Count - 1].trackTemp != 42)
+                {
+                    double[] delta = getDelta(trackReadings[trackReadings.Count - 2], trackReadings[trackReadings.Count - 1]);
+                    int j = 1;
+                    for (int i = trackReadings[trackReadings.Count - 1].trackTemp + 1; i < 43; i++)
+                    {
+                        TrackReading tr = new TrackReading();
+                        tr.trackTemp = i;
+                        tr.lf = Math.Round(trackReadings[trackReadings.Count - 1].lf + (delta[0] * j), 1);
+                        tr.rf = Math.Round(trackReadings[trackReadings.Count - 1].rf + (delta[1] * j), 1);
+                        tr.lr = Math.Round(trackReadings[trackReadings.Count - 1].lr + (delta[2] * j), 1);
+                        tr.rr = Math.Round(trackReadings[trackReadings.Count - 1].rr + (delta[3] * j), 1);
+                        templist.Add(tr);
+                        j++;
+                    }
+                }
+
+                foreach(TrackReading r in trackReadings)
+                {
+                    templist.Add(r);
+                }
+
+                autoReadings.Clear();
+                autoReadings.AddRange(templist);
+                updateGraph();
+            }
+        }
+
+        private double[] getDelta(TrackReading tr1, TrackReading tr2)
+        {
+            //find the change in tyre pressure respective to the change in track temperature
+            double[] r = { 0, 0, 0, 0 };
+            double tempDelta = tr1.trackTemp - tr2.trackTemp;
+            r[0] = (tr1.lf - tr2.lf) / tempDelta;
+            r[1] = (tr1.rf - tr2.rf) / tempDelta;
+            r[2] = (tr1.lr - tr2.lr) / tempDelta;
+            r[3] = (tr1.rr - tr2.rr) / tempDelta;
+            return r;
+        } 
+
+        private void udTrackTemp_ValueChanged(object sender, EventArgs e)
+        {
+            btnAddReading.Enabled = true;
+        }
+
+        private void udLf_ValueChanged(object sender, EventArgs e)
+        {
+            btnAddReading.Enabled = true;
+        }
+
+        private void udRf_ValueChanged(object sender, EventArgs e)
+        {
+            btnAddReading.Enabled = true;
+        }
+
+        private void udLr_ValueChanged(object sender, EventArgs e)
+        {
+            btnAddReading.Enabled = true;
+        }
+
+        private void udRr_ValueChanged(object sender, EventArgs e)
+        {
+            btnAddReading.Enabled = true;
+        }
+
+        private void btnSetStrats_Click(object sender, EventArgs e)
+        {
+            //first check how many Strategies exist, default setups have 3, once a strat is edited in game it creates 30
+            //if there's 30 we'll just overwrite but if there's less than 22 we need to create more
+            if (setup.basicSetup.strategy.pitStrategy.Count < 22)
+            {
+                int c = setup.basicSetup.strategy.pitStrategy.Count;
+                for (int i = 0; i < 22 - c; i++)
+                {
+                    dynamic a = setup.basicSetup.strategy.pitStrategy[0];
+                    setup.basicSetup.strategy.pitStrategy.Add(a);
+                }
+
+                //now we have at least 22 strats
+                //autoReadings = autoReadings.OrderBy(x => x.trackTemp).ToList();
+
+                int j = 0;
+
+                //offset
+                //a value of 0 for a tyr pressure is 20.3 psi in game
+                //every 1 value is 0.1 psi in the game
+                int offset = 203;
+
+                foreach(TrackReading r in autoReadings)
+                {
+
+                    //conver pressure values into setup values
+                    //don't need to worry about decimals since we rounded to 1 place & we multiply by 10 
+                    int[] p = {
+                    Convert.ToInt32(r.lf * 10) - offset,
+                    Convert.ToInt32(r.rf * 10) - offset,
+                    Convert.ToInt32(r.lr * 10) - offset,
+                    Convert.ToInt32(r.rr * 10) - offset
+                    };
+                    //set the pressures for the strat
+                    setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[0] = p[0];
+                    setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[1] = p[1];
+                    setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[2] = p[2];
+                    setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[3] = p[3];
+                    j++;
+
+                }
+                File.WriteAllText(@"c:\temp\test.json", JsonConvert.SerializeObject(setup, Formatting.Indented));
+                btnSetStrats.ForeColor = Color.Green;
+                btnSetStrats.Enabled = false;
+            }
+        }
+
+        private void btnEditReading_Click(object sender, EventArgs e)
+        {
+            btnSetStrats.Enabled = true;
+            if (lbxReadings.SelectedIndex >= 0)
+            {
+                trackReadings[lbxReadings.SelectedIndex].trackTemp = Convert.ToInt32(udEditTT.Value);
+                trackReadings[lbxReadings.SelectedIndex].lf = Convert.ToDouble(udEditLF.Value);
+                trackReadings[lbxReadings.SelectedIndex].rf = Convert.ToDouble(udEditRF.Value);
+                trackReadings[lbxReadings.SelectedIndex].lr = Convert.ToDouble(udEditLR.Value);
+                trackReadings[lbxReadings.SelectedIndex].rr = Convert.ToDouble(udEditRR.Value);
+                btnEditReading.ForeColor = Color.Green;
+            }
+
+            lbxReadings.ClearSelected();
+            udEditTT.Value = 0;
+            udEditLF.Value = 0;
+            udEditRF.Value = 0;
+            udEditLR.Value = 0;
+            udEditRR.Value = 0;
+            ListReadings();
+            generatePressures();
+        }
+
+        private void btnRemoveReading_Click(object sender, EventArgs e)
+        {
+            btnSetStrats.Enabled = true;
+            if (lbxReadings.SelectedIndex >= 0)
+            {
+                trackReadings.RemoveAt(lbxReadings.SelectedIndex);
+            }
+
+            lbxReadings.ClearSelected();
+            udEditTT.Value = 0;
+            udEditLF.Value = 0;
+            udEditRF.Value = 0;
+            udEditLR.Value = 0;
+            udEditRR.Value = 0;
+            ListReadings();
+            generatePressures();
+        }
+
+        private void lbxReadings_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            btnEditReading.ForeColor = Color.White;
+            btnRemoveReading.ForeColor = Color.White;
+            if (lbxReadings.SelectedIndex >= 0)
+            {
+                udEditTT.Value = trackReadings[lbxReadings.SelectedIndex].trackTemp;
+                udEditLF.Value = Convert.ToDecimal(trackReadings[lbxReadings.SelectedIndex].lf);
+                udEditRF.Value = Convert.ToDecimal(trackReadings[lbxReadings.SelectedIndex].rf);
+                udEditLR.Value = Convert.ToDecimal(trackReadings[lbxReadings.SelectedIndex].lr);
+                udEditRR.Value = Convert.ToDecimal(trackReadings[lbxReadings.SelectedIndex].rr);
+            }
+            
+        }
+    }
+
+    public class TrackReading
+    {
+        public int trackTemp;
+        public double lf;
+        public double rf;
+        public double lr;
+        public double rr;
+    }
+
+}
