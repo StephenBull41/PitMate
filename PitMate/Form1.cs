@@ -1,24 +1,18 @@
 ﻿//to do:
-//change graph so that is populates the series with the auto pressure values not assumes values from user entry
 //on graph update set min & max values based on what was calculated in auto pressures
 //no file selected handling
-//sort method to validate & remove duplicate temps
 //validate new reading temp is int
-//add validation reading temp doesn't already exist
 //on set strat validate a strat has been loaded
 
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Windows.Forms;
+using System.Data;
+using System.Linq;
+using System.Drawing;
 using Newtonsoft.Json;
+using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace PitMate
 {
@@ -53,9 +47,8 @@ namespace PitMate
 
         private void ListReadings()
         {
-            trackReadings = trackReadings.GroupBy(x => x.trackTemp).Select(y => y.First()).ToList(); //remove once we validate this temp doesn't yet exist
-            //sort list by track temp
-            trackReadings = trackReadings.OrderBy(x => x.trackTemp).ToList();
+            trackReadings = trackReadings.GroupBy(x => x.trackTemp).Select(y => y.First()).ToList(); //remove duplicate readings
+            trackReadings = trackReadings.OrderBy(x => x.trackTemp).ToList(); //sort list by track temp
             lbxReadings.Items.Clear();
             foreach (TrackReading r in trackReadings)
             {
