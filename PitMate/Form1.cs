@@ -238,41 +238,40 @@ namespace PitMate
                 {
                     dynamic a = setup.basicSetup.strategy.pitStrategy[0];
                     setup.basicSetup.strategy.pitStrategy.Add(a);
-                }
+                }                
+            }
+            //now we have at least 22 strats
+            //autoReadings = autoReadings.OrderBy(x => x.trackTemp).ToList();
 
-                //now we have at least 22 strats
-                //autoReadings = autoReadings.OrderBy(x => x.trackTemp).ToList();
+            int j = 0;
 
-                int j = 0;
+            //offset
+            //a value of 0 for a tyr pressure is 20.3 psi in game
+            //every 1 value is 0.1 psi in the game
+            int offset = 203;
 
-                //offset
-                //a value of 0 for a tyr pressure is 20.3 psi in game
-                //every 1 value is 0.1 psi in the game
-                int offset = 203;
+            foreach (TrackReading r in autoReadings)
+            {
 
-                foreach(TrackReading r in autoReadings)
-                {
-
-                    //conver pressure values into setup values
-                    //don't need to worry about decimals since we rounded to 1 place & we multiply by 10 
-                    int[] p = {
+                //conver pressure values into setup values
+                //don't need to worry about decimals since we rounded to 1 place & we multiply by 10 
+                int[] p = {
                     Convert.ToInt32(r.lf * 10) - offset,
                     Convert.ToInt32(r.rf * 10) - offset,
                     Convert.ToInt32(r.lr * 10) - offset,
                     Convert.ToInt32(r.rr * 10) - offset
                     };
-                    //set the pressures for the strat
-                    setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[0] = p[0];
-                    setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[1] = p[1];
-                    setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[2] = p[2];
-                    setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[3] = p[3];
-                    j++;
+                //set the pressures for the strat
+                setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[0] = p[0];
+                setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[1] = p[1];
+                setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[2] = p[2];
+                setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[3] = p[3];
+                j++;
 
-                }
-                File.WriteAllText(@"c:\temp\test.json", JsonConvert.SerializeObject(setup, Formatting.Indented));
-                btnSetStrats.ForeColor = Color.Green;
-                btnSetStrats.Enabled = false;
             }
+            File.WriteAllText(@"c:\temp\test.json", JsonConvert.SerializeObject(setup, Formatting.Indented));
+            btnSetStrats.ForeColor = Color.Green;
+            btnSetStrats.Enabled = false;
         }
 
         private void btnEditReading_Click(object sender, EventArgs e)
