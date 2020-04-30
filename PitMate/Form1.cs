@@ -31,6 +31,7 @@ namespace PitMate
         public List<TrackReading> autoReadings = new List<TrackReading>();
         //setup loaded by the user
         public dynamic setup;
+        public string setupPath;
 
         private void CarSelect_Click(object sender, EventArgs e)
         {
@@ -43,6 +44,7 @@ namespace PitMate
             setup = JsonConvert.DeserializeObject(s);
             lblCarName.Text = setup.carName;
             lblSetupName.Text = f.FileName.Remove(0, f.FileName.LastIndexOf("\\") + 1);
+            setupPath = f.FileName;
         }
 
         private void ListReadings()
@@ -246,7 +248,7 @@ namespace PitMate
             int j = 0;
 
             //offset
-            //a value of 0 for a tyr pressure is 20.3 psi in game
+            //a value of 0 for a tyre pressure is 20.3 psi in game
             //every 1 value is 0.1 psi in the game
             int offset = 203;
 
@@ -269,9 +271,23 @@ namespace PitMate
                 j++;
 
             }
-            File.WriteAllText(@"c:\temp\test.json", JsonConvert.SerializeObject(setup, Formatting.Indented));
+            string sourcePath  = setupPath.Remove(setupPath.LastIndexOf('\\') + 1);
+            string sourceName  = setupPath.Remove(0, setupPath.LastIndexOf('\\') + 1);
+            string newfilename = "PitMate_" + sourceName;
+            string outputPath  = sourcePath + newfilename;
+
+            int k = 1;
+            while (File.Exists(outputPath) && k < 50)
+            {
+                newfilename = "PitMate" + k.ToString() + "_" + sourceName; //for the message box
+                outputPath = sourcePath + newfilename;
+                k++;
+            }
+
+            File.WriteAllText(outputPath, JsonConvert.SerializeObject(setup, Formatting.Indented));
             btnSetStrats.ForeColor = Color.Green;
             btnSetStrats.Enabled = false;
+            MessageBox.Show($"Created new setup \"{newfilename}\" at:" + Environment.NewLine + sourcePath, "Setup Created");
         }
 
         private void btnEditReading_Click(object sender, EventArgs e)
