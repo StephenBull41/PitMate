@@ -1,8 +1,8 @@
 ﻿//to do:
-//on graph update set min & max values based on what was calculated in auto pressures
-//no file selected handling
-//validate new reading temp is int
-//on set strat validate a strat has been loaded
+//add controls to set fuel to add, tyre set(check if exploitable in game) & brakes front & back
+//update pressure generation range to 15c - 45c
+//update readme on github to reflect new changes
+
 
 
 using System;
@@ -31,7 +31,7 @@ namespace PitMate
         public List<TrackReading> autoReadings = new List<TrackReading>();
         //setup loaded by the user
         public dynamic setup;
-        public string setupPath;
+        public string setupPath = null;
 
         private void CarSelect_Click(object sender, EventArgs e)
         {
@@ -40,11 +40,18 @@ namespace PitMate
             if (username.Contains("\\")) { username = username.Remove(0, username.LastIndexOf("\\") + 1); }
             f.InitialDirectory = $@"C:\Users\{username}\Documents\Assetto Corsa Competizione\Setups";
             f.ShowDialog();
-            string s = File.ReadAllText(f.FileName);    
-            setup = JsonConvert.DeserializeObject(s);
-            lblCarName.Text = setup.carName;
-            lblSetupName.Text = f.FileName.Remove(0, f.FileName.LastIndexOf("\\") + 1);
-            setupPath = f.FileName;
+            if (File.Exists(f.FileName))
+            {
+                string s = File.ReadAllText(f.FileName);
+                setup = JsonConvert.DeserializeObject(s);
+                lblCarName.Text = setup.carName;
+                lblSetupName.Text = f.FileName.Remove(0, f.FileName.LastIndexOf("\\") + 1);
+                setupPath = f.FileName;
+            }
+            else
+            {
+                MessageBox.Show("Failed to load setup");
+            }
         }
 
         private void ListReadings()
@@ -189,6 +196,15 @@ namespace PitMate
                 autoReadings.Clear();
                 autoReadings.AddRange(templist);
                 updateGraph();
+                double[] iMin = { autoReadings.Last().lf, autoReadings.Last().lr, autoReadings.Last().rf, autoReadings.Last().rr };
+                double[] iMax = { autoReadings[0].lf, autoReadings[0].lr, autoReadings[0].rf, autoReadings[0].rr };                
+                int min = Convert.ToInt32(Math.Floor(iMin.Min()));
+                int max = Convert.ToInt32(Math.Ceiling(iMax.Max()));
+                //MessageBox.Show($"min is {min} max is {max}");
+                chtPressures.ChartAreas[0].AxisY.Minimum = min;
+                chtPressures.ChartAreas[0].AxisY.Maximum = max;
+
+                //chtPressures.ChartAreas[0].AxisY.Minimum = Convert.ToDouble(Math.Ceiling())
             }
         }
 
@@ -231,18 +247,23 @@ namespace PitMate
 
         private void btnSetStrats_Click(object sender, EventArgs e)
         {
-            //first check how many Strategies exist, default setups have 3, once a strat is edited in game it creates 30
-            //if there's 30 we'll just overwrite but if there's less than 22 we need to create more
-            if (setup.basicSetup.strategy.pitStrategy.Count < 22)
+            //So I found out similar to how you can exploit setup values to create out of range values you can do the same with the amount of pit strategies you have
+            //the limit of 30 is only imposed by the UI & all we need to do is simply add more into the setup json
+            //due to limitations in game & not being able to set setup display names we want to make the setup number correspond with a track temp
+            //with ingame temps going slightly over 40c we want to exceed the UI limit of 30 strategies
+            //unlike out of range setup changes saving the setup in game will not revert or in this case remove out of range strategies
+            //however the user cannot see out of range strategies until they're in the car & have access to the MFD effectively making them read only
+            
+            //add strategies until we have 45
+            if (setup.basicSetup.strategy.pitStrategy.Count < 45)
             {
                 int c = setup.basicSetup.strategy.pitStrategy.Count;
-                for (int i = 0; i < 22 - c; i++)
+                for (int i = 0; i < 45 - c; i++)
                 {
                     dynamic a = setup.basicSetup.strategy.pitStrategy[0];
                     setup.basicSetup.strategy.pitStrategy.Add(a);
                 }                
             }
-            //now we have at least 22 strats
             //autoReadings = autoReadings.OrderBy(x => x.trackTemp).ToList();
 
             int j = 0;
@@ -271,23 +292,31 @@ namespace PitMate
                 j++;
 
             }
-            string sourcePath  = setupPath.Remove(setupPath.LastIndexOf('\\') + 1);
-            string sourceName  = setupPath.Remove(0, setupPath.LastIndexOf('\\') + 1);
-            string newfilename = "PitMate_" + sourceName;
-            string outputPath  = sourcePath + newfilename;
 
-            int k = 1;
-            while (File.Exists(outputPath) && k < 50)
+            if(setupPath == null)
             {
-                newfilename = "PitMate" + k.ToString() + "_" + sourceName; //for the message box
-                outputPath = sourcePath + newfilename;
-                k++;
+                MessageBox.Show("Cannot set pit strategies with no setup loaded");
             }
+            else
+            {
+                string sourcePath = setupPath.Remove(setupPath.LastIndexOf('\\') + 1);
+                string sourceName = setupPath.Remove(0, setupPath.LastIndexOf('\\') + 1);
+                string newfilename = "PitMate_" + sourceName;
+                string outputPath = sourcePath + newfilename;
 
-            File.WriteAllText(outputPath, JsonConvert.SerializeObject(setup, Formatting.Indented));
-            btnSetStrats.ForeColor = Color.Green;
-            btnSetStrats.Enabled = false;
-            MessageBox.Show($"Created new setup \"{newfilename}\" at:" + Environment.NewLine + sourcePath, "Setup Created");
+                int k = 1;
+                while (File.Exists(outputPath) && k < 50)
+                {
+                    newfilename = "PitMate" + k.ToString() + "_" + sourceName; //for the message box
+                    outputPath = sourcePath + newfilename;
+                    k++;
+                }
+
+                File.WriteAllText(outputPath, JsonConvert.SerializeObject(setup, Formatting.Indented));
+                btnSetStrats.ForeColor = Color.Green;
+                btnSetStrats.Enabled = false;
+                MessageBox.Show($"Created new setup \"{newfilename}\" at:" + Environment.NewLine + sourcePath, "Setup Created");
+            }
         }
 
         private void btnEditReading_Click(object sender, EventArgs e)
