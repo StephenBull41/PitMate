@@ -1,8 +1,8 @@
 ﻿//to do:
-//add controls to set fuel to add, tyre set(check if exploitable in game) & brakes front & back
-//update pressure generation range to 15c - 45c
+//make the settings do stuff
+//add an in app explanation for all the settings
+//
 //update readme on github to reflect new changes
-
 
 
 using System;
@@ -122,11 +122,11 @@ namespace PitMate
                 List<TrackReading> templist = new List<TrackReading>();
 
                 //first extrapolate for readings below the lowest entered reading if needed
-                if (trackReadings[0].trackTemp != 21)
+                if (trackReadings[0].trackTemp != 15)
                 {
                     
                     double[] delta01 = getDelta(trackReadings[0], trackReadings[1]);
-                    for (int i = 21; i < trackReadings[0].trackTemp; i++)
+                    for (int i = 15; i < trackReadings[0].trackTemp; i++)
                     {
                         //if we're here then the lowest temp reading entered is > 21
                         //extrapolate from what data we have to populate readings down to 21c
@@ -152,7 +152,7 @@ namespace PitMate
                 for (int i = 0; i < trackReadings.Count - 1; i++)
                 {
                     //validate we're not working with the final temps & there is a gap between readings
-                    if (trackReadings[i].trackTemp < 41 && (trackReadings[i + 1].trackTemp - trackReadings[i].trackTemp) > 1)
+                    if (trackReadings[i].trackTemp < 45 && (trackReadings[i + 1].trackTemp - trackReadings[i].trackTemp) > 1)
                     {
                         double[] delta = getDelta(trackReadings[i], trackReadings[i + 1]);
                         //create a reading for each degree between existing readings
@@ -171,11 +171,11 @@ namespace PitMate
 
                 //finaly extrapolate readings beyond the highest reading if that reading is not 42(max)
 
-                if (trackReadings[trackReadings.Count - 1].trackTemp != 42)
+                if (trackReadings[trackReadings.Count - 1].trackTemp != 45)
                 {
                     double[] delta = getDelta(trackReadings[trackReadings.Count - 2], trackReadings[trackReadings.Count - 1]);
                     int j = 1;
-                    for (int i = trackReadings[trackReadings.Count - 1].trackTemp + 1; i < 43; i++)
+                    for (int i = trackReadings[trackReadings.Count - 1].trackTemp + 1; i < 46; i++)
                     {
                         TrackReading tr = new TrackReading();
                         tr.trackTemp = i;
@@ -266,7 +266,7 @@ namespace PitMate
             }
             //autoReadings = autoReadings.OrderBy(x => x.trackTemp).ToList();
 
-            int j = 0;
+            int j = 15; //first pressure reading will be for 15c, start from setup 15
 
             //offset
             //a value of 0 for a tyre pressure is 20.3 psi in game
