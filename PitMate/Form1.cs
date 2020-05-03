@@ -294,12 +294,12 @@ namespace PitMate
                 {
                     if (cbxIncTyre.Checked)
                     {
-                        set = Convert.ToInt32(nudTyreSet.Value) + b * Convert.ToInt32(nudTyreStep.Value);
+                        set = Convert.ToInt32(nudTyreSet.Value) + b * Convert.ToInt32(nudTyreStep.Value) - 1;
                         setup.basicSetup.strategy.pitStrategy[j].tyreSet = set;
                     }
                     else
                     {
-                        setup.basicSetup.strategy.pitStrategy[j].tyreSet = Convert.ToInt32(nudTyreSet.Value);
+                        setup.basicSetup.strategy.pitStrategy[j].tyreSet = Convert.ToInt32(nudTyreSet.Value) - 1;
                     }                    
                 }
                 //set the pressures for the strat
@@ -309,8 +309,8 @@ namespace PitMate
                 setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[3] = p[3];
                 //other strat settings
                 setup.basicSetup.strategy.pitStrategy[j].fuelToAdd = Convert.ToInt32(nudFuel.Value);
-                setup.basicSetup.strategy.pitStrategy[j].frontBrakePadCompound = Convert.ToInt32(nudPadF.Value);
-                setup.basicSetup.strategy.pitStrategy[j].rearBrakePadCompound = Convert.ToInt32(nudPadR.Value);
+                setup.basicSetup.strategy.pitStrategy[j].frontBrakePadCompound = Convert.ToInt32(nudPadF.Value) - 1;
+                setup.basicSetup.strategy.pitStrategy[j].rearBrakePadCompound = Convert.ToInt32(nudPadR.Value) - 1;
 
                 j++;
                 b++;
