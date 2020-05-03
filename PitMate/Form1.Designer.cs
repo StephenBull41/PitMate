@@ -70,18 +70,19 @@
             this.label12 = new System.Windows.Forms.Label();
             this.nudFuel = new System.Windows.Forms.NumericUpDown();
             this.label13 = new System.Windows.Forms.Label();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.nudPadF = new System.Windows.Forms.NumericUpDown();
             this.label14 = new System.Windows.Forms.Label();
-            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.nudPadR = new System.Windows.Forms.NumericUpDown();
             this.cbxSetTyre = new System.Windows.Forms.CheckBox();
-            this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.nudTyreSet = new System.Windows.Forms.NumericUpDown();
+            this.cbxIncTyre = new System.Windows.Forms.CheckBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.numericUpDown4 = new System.Windows.Forms.NumericUpDown();
+            this.nudTyreStep = new System.Windows.Forms.NumericUpDown();
             this.label16 = new System.Windows.Forms.Label();
-            this.numericUpDown5 = new System.Windows.Forms.NumericUpDown();
+            this.nudTmin = new System.Windows.Forms.NumericUpDown();
             this.label17 = new System.Windows.Forms.Label();
-            this.numericUpDown6 = new System.Windows.Forms.NumericUpDown();
+            this.nudTmax = new System.Windows.Forms.NumericUpDown();
+            this.btnExplainSettings = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.udLf)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.udRf)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.udLr)).BeginInit();
@@ -97,12 +98,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.udEditRR)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudOffset)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudFuel)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudPadF)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudPadR)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTyreSet)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTyreStep)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTmin)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTmax)).BeginInit();
             this.SuspendLayout();
             // 
             // CarSelect
@@ -338,7 +339,7 @@
             series1.Points.Add(dataPoint1);
             series1.Points.Add(dataPoint2);
             this.chtPressures.Series.Add(series1);
-            this.chtPressures.Size = new System.Drawing.Size(917, 345);
+            this.chtPressures.Size = new System.Drawing.Size(1410, 345);
             this.chtPressures.TabIndex = 15;
             this.chtPressures.Text = "chart1";
             // 
@@ -615,29 +616,29 @@
             // 
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.Location = new System.Drawing.Point(953, 119);
+            this.label13.Location = new System.Drawing.Point(1184, 15);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(91, 24);
             this.label13.TabIndex = 25;
             this.label13.Text = "Front pad";
             // 
-            // numericUpDown1
+            // nudPadF
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(1109, 121);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
+            this.nudPadF.Location = new System.Drawing.Point(1340, 17);
+            this.nudPadF.Maximum = new decimal(new int[] {
             4,
             0,
             0,
             0});
-            this.numericUpDown1.Minimum = new decimal(new int[] {
+            this.nudPadF.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(69, 20);
-            this.numericUpDown1.TabIndex = 24;
-            this.numericUpDown1.Value = new decimal(new int[] {
+            this.nudPadF.Name = "nudPadF";
+            this.nudPadF.Size = new System.Drawing.Size(69, 20);
+            this.nudPadF.TabIndex = 24;
+            this.nudPadF.Value = new decimal(new int[] {
             1,
             0,
             0,
@@ -647,29 +648,29 @@
             // 
             this.label14.AutoSize = true;
             this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label14.Location = new System.Drawing.Point(953, 145);
+            this.label14.Location = new System.Drawing.Point(1184, 41);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(87, 24);
             this.label14.TabIndex = 27;
             this.label14.Text = "Rear pad";
             // 
-            // numericUpDown2
+            // nudPadR
             // 
-            this.numericUpDown2.Location = new System.Drawing.Point(1109, 147);
-            this.numericUpDown2.Maximum = new decimal(new int[] {
+            this.nudPadR.Location = new System.Drawing.Point(1340, 43);
+            this.nudPadR.Maximum = new decimal(new int[] {
             4,
             0,
             0,
             0});
-            this.numericUpDown2.Minimum = new decimal(new int[] {
+            this.nudPadR.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(69, 20);
-            this.numericUpDown2.TabIndex = 26;
-            this.numericUpDown2.Value = new decimal(new int[] {
+            this.nudPadR.Name = "nudPadR";
+            this.nudPadR.Size = new System.Drawing.Size(69, 20);
+            this.nudPadR.TabIndex = 26;
+            this.nudPadR.Value = new decimal(new int[] {
             1,
             0,
             0,
@@ -679,73 +680,73 @@
             // 
             this.cbxSetTyre.AutoSize = true;
             this.cbxSetTyre.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
-            this.cbxSetTyre.Location = new System.Drawing.Point(957, 169);
+            this.cbxSetTyre.Location = new System.Drawing.Point(1188, 65);
             this.cbxSetTyre.Name = "cbxSetTyre";
             this.cbxSetTyre.Size = new System.Drawing.Size(120, 28);
             this.cbxSetTyre.TabIndex = 28;
             this.cbxSetTyre.Text = "Set tyre set";
             this.cbxSetTyre.UseVisualStyleBackColor = true;
             // 
-            // numericUpDown3
+            // nudTyreSet
             // 
-            this.numericUpDown3.Location = new System.Drawing.Point(1109, 173);
-            this.numericUpDown3.Maximum = new decimal(new int[] {
+            this.nudTyreSet.Location = new System.Drawing.Point(1340, 69);
+            this.nudTyreSet.Maximum = new decimal(new int[] {
             50,
             0,
             0,
             0});
-            this.numericUpDown3.Minimum = new decimal(new int[] {
+            this.nudTyreSet.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(69, 20);
-            this.numericUpDown3.TabIndex = 29;
-            this.numericUpDown3.Value = new decimal(new int[] {
+            this.nudTyreSet.Name = "nudTyreSet";
+            this.nudTyreSet.Size = new System.Drawing.Size(69, 20);
+            this.nudTyreSet.TabIndex = 29;
+            this.nudTyreSet.Value = new decimal(new int[] {
             1,
             0,
             0,
             0});
             // 
-            // checkBox1
+            // cbxIncTyre
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
-            this.checkBox1.Location = new System.Drawing.Point(957, 192);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(182, 28);
-            this.checkBox1.TabIndex = 30;
-            this.checkBox1.Text = "Increment tyre set ";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.cbxIncTyre.AutoSize = true;
+            this.cbxIncTyre.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
+            this.cbxIncTyre.Location = new System.Drawing.Point(1188, 88);
+            this.cbxIncTyre.Name = "cbxIncTyre";
+            this.cbxIncTyre.Size = new System.Drawing.Size(182, 28);
+            this.cbxIncTyre.TabIndex = 30;
+            this.cbxIncTyre.Text = "Increment tyre set ";
+            this.cbxIncTyre.UseVisualStyleBackColor = true;
             // 
             // label15
             // 
             this.label15.AutoSize = true;
             this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label15.Location = new System.Drawing.Point(953, 218);
+            this.label15.Location = new System.Drawing.Point(1184, 114);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(134, 24);
             this.label15.TabIndex = 32;
             this.label15.Text = "Increment step";
             // 
-            // numericUpDown4
+            // nudTyreStep
             // 
-            this.numericUpDown4.Location = new System.Drawing.Point(1109, 220);
-            this.numericUpDown4.Maximum = new decimal(new int[] {
+            this.nudTyreStep.Location = new System.Drawing.Point(1340, 116);
+            this.nudTyreStep.Maximum = new decimal(new int[] {
             4,
             0,
             0,
             0});
-            this.numericUpDown4.Minimum = new decimal(new int[] {
+            this.nudTyreStep.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown4.Name = "numericUpDown4";
-            this.numericUpDown4.Size = new System.Drawing.Size(69, 20);
-            this.numericUpDown4.TabIndex = 31;
-            this.numericUpDown4.Value = new decimal(new int[] {
+            this.nudTyreStep.Name = "nudTyreStep";
+            this.nudTyreStep.Size = new System.Drawing.Size(69, 20);
+            this.nudTyreStep.TabIndex = 31;
+            this.nudTyreStep.Value = new decimal(new int[] {
             1,
             0,
             0,
@@ -761,17 +762,18 @@
             this.label16.TabIndex = 34;
             this.label16.Text = "Strat min temp";
             // 
-            // numericUpDown5
+            // nudTmin
             // 
-            this.numericUpDown5.Location = new System.Drawing.Point(1109, 43);
-            this.numericUpDown5.Name = "numericUpDown5";
-            this.numericUpDown5.Size = new System.Drawing.Size(69, 20);
-            this.numericUpDown5.TabIndex = 33;
-            this.numericUpDown5.Value = new decimal(new int[] {
+            this.nudTmin.Location = new System.Drawing.Point(1109, 43);
+            this.nudTmin.Name = "nudTmin";
+            this.nudTmin.Size = new System.Drawing.Size(69, 20);
+            this.nudTmin.TabIndex = 33;
+            this.nudTmin.Value = new decimal(new int[] {
             15,
             0,
             0,
             0});
+            this.nudTmin.ValueChanged += new System.EventHandler(this.nudTmin_ValueChanged);
             // 
             // label17
             // 
@@ -783,37 +785,52 @@
             this.label17.TabIndex = 36;
             this.label17.Text = "Strat max temp";
             // 
-            // numericUpDown6
+            // nudTmax
             // 
-            this.numericUpDown6.Location = new System.Drawing.Point(1109, 69);
-            this.numericUpDown6.Name = "numericUpDown6";
-            this.numericUpDown6.Size = new System.Drawing.Size(69, 20);
-            this.numericUpDown6.TabIndex = 35;
-            this.numericUpDown6.Value = new decimal(new int[] {
+            this.nudTmax.Location = new System.Drawing.Point(1109, 69);
+            this.nudTmax.Name = "nudTmax";
+            this.nudTmax.Size = new System.Drawing.Size(69, 20);
+            this.nudTmax.TabIndex = 35;
+            this.nudTmax.Value = new decimal(new int[] {
             45,
             0,
             0,
             0});
+            this.nudTmax.ValueChanged += new System.EventHandler(this.nudTmax_ValueChanged);
+            // 
+            // btnExplainSettings
+            // 
+            this.btnExplainSettings.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.btnExplainSettings.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnExplainSettings.ForeColor = System.Drawing.Color.White;
+            this.btnExplainSettings.Location = new System.Drawing.Point(1188, 142);
+            this.btnExplainSettings.Name = "btnExplainSettings";
+            this.btnExplainSettings.Size = new System.Drawing.Size(221, 42);
+            this.btnExplainSettings.TabIndex = 37;
+            this.btnExplainSettings.Text = "What\'s all this?";
+            this.btnExplainSettings.UseVisualStyleBackColor = false;
+            this.btnExplainSettings.Click += new System.EventHandler(this.btnExplainSettings_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.ClientSize = new System.Drawing.Size(1190, 558);
+            this.ClientSize = new System.Drawing.Size(1414, 558);
+            this.Controls.Add(this.btnExplainSettings);
             this.Controls.Add(this.label17);
-            this.Controls.Add(this.numericUpDown6);
+            this.Controls.Add(this.nudTmax);
             this.Controls.Add(this.label16);
-            this.Controls.Add(this.numericUpDown5);
+            this.Controls.Add(this.nudTmin);
             this.Controls.Add(this.label15);
-            this.Controls.Add(this.numericUpDown4);
-            this.Controls.Add(this.checkBox1);
-            this.Controls.Add(this.numericUpDown3);
+            this.Controls.Add(this.nudTyreStep);
+            this.Controls.Add(this.cbxIncTyre);
+            this.Controls.Add(this.nudTyreSet);
             this.Controls.Add(this.cbxSetTyre);
             this.Controls.Add(this.label14);
-            this.Controls.Add(this.numericUpDown2);
+            this.Controls.Add(this.nudPadR);
             this.Controls.Add(this.label13);
-            this.Controls.Add(this.numericUpDown1);
+            this.Controls.Add(this.nudPadF);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.nudFuel);
             this.Controls.Add(this.label11);
@@ -847,12 +864,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.udEditRR)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudOffset)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudFuel)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudPadF)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudPadR)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTyreSet)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTyreStep)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTmin)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTmax)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -897,18 +914,19 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.NumericUpDown nudFuel;
         private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown nudPadF;
         private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.NumericUpDown numericUpDown2;
+        private System.Windows.Forms.NumericUpDown nudPadR;
         private System.Windows.Forms.CheckBox cbxSetTyre;
-        private System.Windows.Forms.NumericUpDown numericUpDown3;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.NumericUpDown nudTyreSet;
+        private System.Windows.Forms.CheckBox cbxIncTyre;
         private System.Windows.Forms.Label label15;
-        private System.Windows.Forms.NumericUpDown numericUpDown4;
+        private System.Windows.Forms.NumericUpDown nudTyreStep;
         private System.Windows.Forms.Label label16;
-        private System.Windows.Forms.NumericUpDown numericUpDown5;
+        private System.Windows.Forms.NumericUpDown nudTmin;
         private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.NumericUpDown numericUpDown6;
+        private System.Windows.Forms.NumericUpDown nudTmax;
+        private System.Windows.Forms.Button btnExplainSettings;
     }
 }
 

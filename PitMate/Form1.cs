@@ -114,7 +114,9 @@ namespace PitMate
         private void generatePressures()
         {
             //remove duplicate temps
-            
+            int tMin = Convert.ToInt32(nudTmin.Value);
+            int tMax = Convert.ToInt32(nudTmax.Value);
+
             if (trackReadings.Count > 1)
             {
 
@@ -122,11 +124,11 @@ namespace PitMate
                 List<TrackReading> templist = new List<TrackReading>();
 
                 //first extrapolate for readings below the lowest entered reading if needed
-                if (trackReadings[0].trackTemp != 15)
+                if (trackReadings[0].trackTemp != tMin)
                 {
                     
                     double[] delta01 = getDelta(trackReadings[0], trackReadings[1]);
-                    for (int i = 15; i < trackReadings[0].trackTemp; i++)
+                    for (int i = tMin; i < trackReadings[0].trackTemp; i++)
                     {
                         //if we're here then the lowest temp reading entered is > 21
                         //extrapolate from what data we have to populate readings down to 21c
@@ -152,7 +154,7 @@ namespace PitMate
                 for (int i = 0; i < trackReadings.Count - 1; i++)
                 {
                     //validate we're not working with the final temps & there is a gap between readings
-                    if (trackReadings[i].trackTemp < 45 && (trackReadings[i + 1].trackTemp - trackReadings[i].trackTemp) > 1)
+                    if (trackReadings[i].trackTemp < tMax && (trackReadings[i + 1].trackTemp - trackReadings[i].trackTemp) > 1)
                     {
                         double[] delta = getDelta(trackReadings[i], trackReadings[i + 1]);
                         //create a reading for each degree between existing readings
@@ -171,11 +173,11 @@ namespace PitMate
 
                 //finaly extrapolate readings beyond the highest reading if that reading is not 42(max)
 
-                if (trackReadings[trackReadings.Count - 1].trackTemp != 45)
+                if (trackReadings[trackReadings.Count - 1].trackTemp != tMax)
                 {
                     double[] delta = getDelta(trackReadings[trackReadings.Count - 2], trackReadings[trackReadings.Count - 1]);
                     int j = 1;
-                    for (int i = trackReadings[trackReadings.Count - 1].trackTemp + 1; i < 46; i++)
+                    for (int i = trackReadings[trackReadings.Count - 1].trackTemp + 1; i < tMax + 1; i++)
                     {
                         TrackReading tr = new TrackReading();
                         tr.trackTemp = i;
@@ -253,12 +255,13 @@ namespace PitMate
             //with ingame temps going slightly over 40c we want to exceed the UI limit of 30 strategies
             //unlike out of range setup changes saving the setup in game will not revert or in this case remove out of range strategies
             //however the user cannot see out of range strategies until they're in the car & have access to the MFD effectively making them read only
-            
-            //add strategies until we have 45
-            if (setup.basicSetup.strategy.pitStrategy.Count < 45)
+
+            //add strategies until we have enough to deal with the ranges the user wants
+            int reqStrats = Convert.ToInt32(nudTmax.Value) - Convert.ToInt32(nudTmin.Value) + Convert.ToInt32(nudOffset.Value);
+            if (setup.basicSetup.strategy.pitStrategy.Count < reqStrats)
             {
                 int c = setup.basicSetup.strategy.pitStrategy.Count;
-                for (int i = 0; i < 45 - c; i++)
+                for (int i = c; i <= reqStrats; i++)
                 {
                     dynamic a = setup.basicSetup.strategy.pitStrategy[0];
                     setup.basicSetup.strategy.pitStrategy.Add(a);
@@ -266,7 +269,8 @@ namespace PitMate
             }
             //autoReadings = autoReadings.OrderBy(x => x.trackTemp).ToList();
 
-            int j = 15; //first pressure reading will be for 15c, start from setup 15
+            int j = Convert.ToInt32(nudOffset.Value); //pit strat offset
+            int b = j;
 
             //offset
             //a value of 0 for a tyre pressure is 20.3 psi in game
@@ -275,23 +279,26 @@ namespace PitMate
 
             foreach (TrackReading r in autoReadings)
             {
-
                 //conver pressure values into setup values
                 //don't need to worry about decimals since we rounded to 1 place & we multiply by 10 
                 int[] p = {
-                    Convert.ToInt32(r.lf * 10) - offset,
-                    Convert.ToInt32(r.rf * 10) - offset,
-                    Convert.ToInt32(r.lr * 10) - offset,
-                    Convert.ToInt32(r.rr * 10) - offset
-                    };
+                Convert.ToInt32(r.lf * 10) - offset,
+                Convert.ToInt32(r.rf * 10) - offset,
+                Convert.ToInt32(r.lr * 10) - offset,
+                Convert.ToInt32(r.rr * 10) - offset
+                };
                 //set the pressures for the strat
                 setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[0] = p[0];
                 setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[1] = p[1];
                 setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[2] = p[2];
-                setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[3] = p[3];
-                j++;
+                setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[3] = p[3];                    
 
+                j++;
             }
+            //if(j > 45 - b)
+            //{
+                //MessageBox.Show($"Unable to write some strategies, offset + temp range too high");
+            //}
 
             if(setupPath == null)
             {
@@ -373,6 +380,28 @@ namespace PitMate
                 udEditRR.Value = Convert.ToDecimal(trackReadings[lbxReadings.SelectedIndex].rr);
             }
             
+        }
+
+        private void btnExplainSettings_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Strat min & Max: sets the minimum & maximum track temperatures strategies will be created for" + Environment.NewLine +
+                "Strat offset: sets what strat number the strats will start at" + Environment.NewLine +
+                "Fuel to add: sets a fuel value on every strat" + Environment.NewLine +
+                "Front & rear pad: sets the brake pad for each strat" + Environment.NewLine +
+                "Set tyre set: sets a tyre set for each strat" + Environment.NewLine +
+                "increment tyre set: makes each strat increase the tyre set by the step value so you get a different tyre set for each strat");
+        }
+
+        private void nudTmin_ValueChanged(object sender, EventArgs e)
+        {
+            generatePressures();
+            chtPressures.ChartAreas[0].AxisX.Minimum = Convert.ToInt32(nudTmin.Value);
+        }
+
+        private void nudTmax_ValueChanged(object sender, EventArgs e)
+        {
+            generatePressures();
+            chtPressures.ChartAreas[0].AxisX.Maximum = Convert.ToInt32(nudTmax.Value);
         }
     }
 
