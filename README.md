@@ -11,12 +11,9 @@ e.g strat 22 is for a 22c track
 3. Repeat step 2 for each reading
 Once 2 or more readings are added a graph will be updated to show expected pressures over a temperature range
 4. Load the setup that was used to take the readings, if you're using a default setup save it as a new setup
-
-4(a). edit optional settings
-
-5. Press "set pit strats" - this will create a new setup
-
-6. Load & use the setup ingame
+5. edit optional settings
+6. Press "set pit strats" - this will create a new setup
+7. Load & use the setup ingame
 
 # Important considerations
 
