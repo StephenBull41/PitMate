@@ -1,8 +1,9 @@
 # What it does
-PitMate takes two or more pressure readings and forms pit stratergies for all track temps commonly found in ACC (21c-42c)
+PitMate takes two or more pressure readings and forms pit stratergies for all track temps commonly found in ACC
 
-This creates pit stats that allign with track temps, each strat is for it's strat number + 20.
-For example you're in a race & the track is cooling, the track has gone down to 25c. In this scenario if you wanted the correct pressurs for 25c you would use pit strat 5 (25 - 20), for 32c you would use strat 12 etc.
+This allows you to create pit strats for every track temperature with minimal effort
+With default settings the strat numbers will match the track temp they are created for
+e.g strat 22 is for a 22c track
 
 # How to use
 1. Find the optimum pressures at 2 or more track temperatures(recommended 3)
@@ -10,8 +11,9 @@ For example you're in a race & the track is cooling, the track has gone down to 
 3. Repeat step 2 for each reading
 Once 2 or more readings are added a graph will be updated to show expected pressures over a temperature range
 4. Load the setup that was used to take the readings, if you're using a default setup save it as a new setup
-5. Press "set pit strats" - this currently creates "c:\temp\test.json" & does not alter the loaded setup this will be changed in a future update
-6. Move & rename the setup, in future the setup will be in the correct place
+4(a). edit optional settings
+5. Press "set pit strats" - this will create a new setup
+6. Load & use the setup ingame
 
 # Important considerations
 
