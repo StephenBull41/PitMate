@@ -1,7 +1,7 @@
 # What it does
-PitMate takes two or more pressure readings and forms pit stratergies for all track temps commonly found in ACC
+PitMate takes two or more pressure readings and forms pit stratergies for all track temps commonly found in ACC.
 
-This allows you to create pit strats for every track temperature with minimal effort
+This allows you to create pit strats for every track temperature with minimal effort.
 With default settings the strat numbers will match the track temp they are created for
 e.g strat 22 is for a 22c track
 
