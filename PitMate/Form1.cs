@@ -270,7 +270,7 @@ namespace PitMate
             //autoReadings = autoReadings.OrderBy(x => x.trackTemp).ToList();
 
             int j = Convert.ToInt32(nudOffset.Value); //pit strat offset
-            int b = j;
+            int b = 0;
 
             //offset
             //a value of 0 for a tyre pressure is 20.3 psi in game
@@ -282,23 +282,39 @@ namespace PitMate
                 //conver pressure values into setup values
                 //don't need to worry about decimals since we rounded to 1 place & we multiply by 10 
                 int[] p = {
-                Convert.ToInt32(r.lf * 10) - offset,
-                Convert.ToInt32(r.rf * 10) - offset,
-                Convert.ToInt32(r.lr * 10) - offset,
-                Convert.ToInt32(r.rr * 10) - offset
+                    Convert.ToInt32(r.lf * 10) - offset,
+                    Convert.ToInt32(r.rf * 10) - offset,
+                    Convert.ToInt32(r.lr * 10) - offset,
+                    Convert.ToInt32(r.rr * 10) - offset
                 };
+
+                //tyre set settings
+                int set = 0;
+                if (cbxSetTyre.Checked)
+                {
+                    if (cbxIncTyre.Checked)
+                    {
+                        set = Convert.ToInt32(nudTyreSet.Value) + b * Convert.ToInt32(nudTyreStep.Value);
+                        setup.basicSetup.strategy.pitStrategy[j].tyreSet = set;
+                    }
+                    else
+                    {
+                        setup.basicSetup.strategy.pitStrategy[j].tyreSet = Convert.ToInt32(nudTyreSet.Value);
+                    }                    
+                }
                 //set the pressures for the strat
                 setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[0] = p[0];
                 setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[1] = p[1];
                 setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[2] = p[2];
-                setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[3] = p[3];                    
+                setup.basicSetup.strategy.pitStrategy[j].tyres.tyrePressure[3] = p[3];
+                //other strat settings
+                setup.basicSetup.strategy.pitStrategy[j].fuelToAdd = Convert.ToInt32(nudFuel.Value);
+                setup.basicSetup.strategy.pitStrategy[j].frontBrakePadCompound = Convert.ToInt32(nudPadF.Value);
+                setup.basicSetup.strategy.pitStrategy[j].rearBrakePadCompound = Convert.ToInt32(nudPadR.Value);
 
                 j++;
+                b++;
             }
-            //if(j > 45 - b)
-            //{
-                //MessageBox.Show($"Unable to write some strategies, offset + temp range too high");
-            //}
 
             if(setupPath == null)
             {
